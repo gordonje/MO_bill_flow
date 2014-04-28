@@ -110,6 +110,8 @@ for i in all_senate_bills:
 
 ########## Getting bill topics ##########
 
+print "Getting topics..."
+
 sleep(3)
 
 topics_output = scrapers.get_senate_bill_topics(request_year, session)
