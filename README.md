@@ -28,12 +28,12 @@ The first general component of this project is what you might call 'data acquisi
 These scripts share a module of functions -- scrapers.py -- which gathers records from specific web pages and prepares them to save to the database. You'll note there over a dozen functions in scrapers.py, half for each chamber. Since both the structure of web pages and the records we could extract from [house.mo.gov](http://www.house.mo.gov/ "house.mo.gov") and [senate.mo.gov](http://www.senate.mo.gov/ "senate.mo.gov") were similar but not entirely the same, there seemed no practical way to avoid distinct sets of functions for each chamber.
 
 get_house_data.py and get_senate_data.py are also quite similar to each other. The general steps for each script are as follows:
-# First, check to see if there's already a version of the given year's database. If so, a copy is saved in the 'DBs_Archive/' directory so that you can easily revert to the previous version.
-# Delete all records from tables related to the given chamber.
-# Gathers a list of all bills introduced in the given chamber for the given year.
-# Request and stores info for each of these bills.
-# Request and stores all actions for each bill.
-# Request and stores a list of all legislators in the given chamber for the given year.
+* First, check to see if there's already a version of the given year's database. If so, a copy is saved in the 'DBs_Archive/' directory so that you can easily revert to the previous version.
+* Delete all records from tables related to the given chamber.
+* Gathers a list of all bills introduced in the given chamber for the given year.
+* Request and stores info for each of these bills.
+* Request and stores all actions for each bill.
+* Request and stores a list of all legislators in the given chamber for the given year
 
 With roughly 1,400 House Bills per regular annual session and accounting for the deliberate throttling of requests we're sending (because we want to be kind to other people's web servers), get_house_data.py may need to run for _over six hours_. Since there are fewer Senate Bills in a given regular session, get_senate_data.py requires _at least two and half hours_.
 
