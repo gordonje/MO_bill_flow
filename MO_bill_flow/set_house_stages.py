@@ -15,46 +15,46 @@ c = conn.cursor()
 c.execute('''UPDATE house_actions  
 SET stage = CASE  
 	WHEN Action_Desc LIKE '%Introduced%' THEN 'INTRODUCED HOUSE' 
-WHEN Action_Desc LIKE '%Prefiled%' THEN 'INTRODUCED HOUSE' 
-WHEN Action_Desc LIKE '%Offered%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE '%Read First Time%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE '%First Read%' THEN 'INTRODUCED HOUSE' 
-WHEN Action_Desc LIKE '%Read Second Time%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE '%Second Read%' THEN 'INTRODUCED HOUSE' 
-WHEN Action_Desc LIKE '%Public Hearing Completed (H)%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE '%Public Hearing Continued (H)%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE '%Public Hearing Scheduled, Bill not Heard (H)%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE 'Referred: %(H)' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE 'Rules %(H)' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE 'Rules - Returned%(H)' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE 'Action Postponed (H)' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE 'Placed on Informal Calendar%' THEN 'INTRODUCED HOUSE'
-WHEN Action_Desc LIKE '%Read Third Time%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%Prefiled%' THEN 'INTRODUCED HOUSE' 
+	WHEN Action_Desc LIKE '%Offered%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%Read First Time%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%First Read%' THEN 'INTRODUCED HOUSE' 
+	WHEN Action_Desc LIKE '%Read Second Time%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%Second Read%' THEN 'INTRODUCED HOUSE' 
+	WHEN Action_Desc LIKE '%Public Hearing Completed (H)%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%Public Hearing Continued (H)%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%Public Hearing Scheduled, Bill not Heard (H)%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE 'Referred: %(H)' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE 'Rules %(H)' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE 'Rules - Returned%(H)' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE 'Action Postponed (H)' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE 'Placed on Informal Calendar%' THEN 'INTRODUCED HOUSE'
+	WHEN Action_Desc LIKE '%Read Third Time%' THEN 'INTRODUCED HOUSE'
 
-WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE COMMITTEE'
 
-WHEN Action_Desc LIKE '%Do Pass%(H)' THEN 'PASS HOUSE COMMITTEE'
-WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
-WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
-WHEN Action_Desc LIKE 'Perfected%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE '%Do Pass%(H)' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
+	WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
+	WHEN Action_Desc LIKE 'Perfected%' THEN 'PASS HOUSE COMMITTEE'
 
-WHEN Action_Desc IS 'Adopted (H)' THEN 'PASS HOUSE'
-WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'PASS HOUSE'
+	WHEN Action_Desc IS 'Adopted (H)' THEN 'PASS HOUSE'
+	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'PASS HOUSE'
 
-WHEN Action_Desc IS 'Adopted (S)' THEN 'PASS SENATE'
-WHEN Action_Desc IS 'Approved (H)' THEN 'PASS HOUSE'
-WHEN Action_Desc IS 'Reported to The Senate (S)' THEN 'PASS HOUSE'
-WHEN Action_Desc LIKE 'Reported to The House with%(H)%' THEN 'PASS SENATE'
-WHEN Action_Desc IS 'Approved (S)' THEN 'PASS SENATE'
+	WHEN Action_Desc IS 'Adopted (S)' THEN 'PASS SENATE'
+	WHEN Action_Desc IS 'Approved (H)' THEN 'PASS HOUSE'
+	WHEN Action_Desc IS 'Reported to The Senate (S)' THEN 'PASS HOUSE'
+	WHEN Action_Desc LIKE 'Reported to The House with%(H)%' THEN 'PASS SENATE'
+	WHEN Action_Desc IS 'Approved (S)' THEN 'PASS SENATE'
 
-WHEN Action_Desc IS 'Delivered to Secretary of State (G)' THEN 'PASS CONFERENCE COMMITTEE'
+	WHEN Action_Desc IS 'Delivered to Secretary of State (G)' THEN 'PASS CONFERENCE COMMITTEE'
 
-WHEN Action_Desc LIKE '%WITHDRAWN (H)%' THEN 'WITHDRAWN'
+	WHEN Action_Desc LIKE '%WITHDRAWN (H)%' THEN 'WITHDRAWN'
 	ELSE NULL END;'''
 )
 
 # Need to test if this exists, then drop it if so
-c.execute('''DROP TABLE house_numbers''')
+c.execute('''DROP TABLE IF EXISTS house_numbers''')
 
 conn.commit()
 
