@@ -395,8 +395,8 @@ def get_senators (year, requests_session):
 		else:
 			senator = []
 
-			senator.append(name.split(" ")[0])
-			senator.append(name.split(" ")[1])
+			senator.append(re.search('^\w+', name).group())
+			senator.append(re.search('\w+$', name).group())
 
 			party_district = raw_senator.pop(-1).split('-')
 
