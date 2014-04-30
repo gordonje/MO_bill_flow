@@ -1,5 +1,6 @@
 from datetime import datetime
 from os import path
+import shutil
 import sqlite3
 
 start_time = datetime.now()
@@ -45,6 +46,7 @@ c.execute('''CREATE TABLE house_actions (
 	action_date DATE NOT NULL,
 	journal_page VARCHAR(25) NULL,
 	action_desc TEXT NULL,
+	stage VARCHAR(15) NULL,
 	FOREIGN KEY(bill_type, bill_number) REFERENCES house_bills (bill_type, bill_number)
 	)''')
 
@@ -79,7 +81,7 @@ c.execute('''CREATE TABLE representatives (
 	room VARCHAR(4) NOT NULL
 	)''')
 
-####### Senate tables #######
+###### Senate tables #######
 
 c.execute('''CREATE TABLE senate_bills (
 	bill_type VARCHAR(4) NOT NULL,
@@ -101,6 +103,7 @@ c.execute('''CREATE TABLE senate_actions (
 	bill_number INTEGER NOT NULL,
 	action_date DATE NOT NULL,
 	action_desc TEXT,
+	stage VARCHAR(15) NULL,
 	FOREIGN KEY(bill_type, bill_number) REFERENCES senate_bills (bill_type, bill_number)
 	)''')
 
