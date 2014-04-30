@@ -12,7 +12,7 @@ conn.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
 c = conn.cursor()
 
 # This is our mapping of actions descriptions to legislative stages. May change as we learn more about the legislative process.
-c.execute('''UPDATE house_actions  
+c.execute('''UPDATE senate_actions  
 SET stage = CASE  
 	WHEN Action_Desc LIKE '%Introduced%' THEN 'INTRODUCED HOUSE' 
 	WHEN Action_Desc LIKE '%Prefiled%' THEN 'INTRODUCED HOUSE' 
@@ -53,11 +53,11 @@ SET stage = CASE
 	ELSE NULL END;'''
 )
 
-c.execute('''DROP TABLE IF EXISTS house_numbers''')
+c.execute('''DROP TABLE IF EXISTS senate_numbers''')
 
 conn.commit()
 
-c.execute('''CREATE TABLE house_numbers (
+c.execute('''CREATE TABLE senate_numbers (
 	stage VARCHAR(15) NOT NULL,
 	all_bills INTEGER NULL,
 	dem_bills INTEGER NULL,
@@ -65,47 +65,47 @@ c.execute('''CREATE TABLE house_numbers (
 	)'''
 )
 
-c.execute('''INSERT INTO house_numbers (stage) SELECT stage FROM house_actions WHERE stage IS NOT NULL GROUP BY stage''')
+c.execute('''INSERT INTO senate_numbers (stage) SELECT stage FROM senate_actions WHERE stage IS NOT NULL GROUP BY stage''')
 conn.commit()
 
 stages = []
-for row in c.execute('''SELECT DISTINCT stage FROM house_actions WHERE stage IS NOT NULL;''').fetchall():
+for row in c.execute('''SELECT DISTINCT stage FROM senate_actions WHERE stage IS NOT NULL;''').fetchall():
 	stages.append(row[0])
 
 for stage in stages:
-	c.execute('''UPDATE house_numbers 
+	c.execute('''UPDATE senate_numbers 
 		SET all_bills = (
 			SELECT count(*) 
-			FROM house_bills 
+			FROM senate_bills 
 			WHERE bill_type + bill_number IN (
 				select bill_type + bill_number
-				from house_actions 
+				from senate_actions 
 				where stage = ?
 				)
 		),
 		dem_bills = (
 			SELECT count(*) 
-			FROM house_bills
-			JOIN representatives
-			ON representatives.district = house_bills.sponsor_district 
+			FROM senate_bills
+			JOIN senators
+			ON senators.last_name = senate_bills.sponsor
 			WHERE bill_type + bill_number IN (
 				SELECT bill_type + bill_number 
-				FROM house_actions 
+				FROM senate_actions 
 				WHERE stage = ?
 				)
-			and representatives.party = 'Democrat'
+			and senators.party = 'D'
 			),
 		rep_bills = (
 			SELECT count(*) 
-			FROM house_bills
-			JOIN representatives
-			ON representatives.district = house_bills.sponsor_district 
+			FROM senate_bills
+			JOIN senators
+			ON senators.last_name = senate_bills.sponsor 
 			WHERE bill_type + bill_number in (
 				SELECT bill_type + bill_number 
-				FROM house_actions 
+				FROM senate_actions 
 				WHERE stage = ?
 				)
-			AND representatives.party = 'Republican'
+			AND senators.party = 'R'
 			)
 		WHERE stage = ?
 	''', (stage, stage, stage, stage))
