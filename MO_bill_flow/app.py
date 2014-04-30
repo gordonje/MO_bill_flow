@@ -48,34 +48,32 @@ def close_db(error):
 def hello():
     return 'Hello, World.'
 
-@app.route("/house_bills")
-def bills():
+@app.route("/house")
+def house_bills():
     connection = get_db()
-    cursor = connection.execute('select count(*) as Bill_Count from house_bills;')
+    cursor = connection.execute('select * from house_numbers;')
 
     house_bills = []
     for row in cursor.fetchall():
+        print dict(row)
         house_bills.append(dict(row))
 
-    template = json.dumps(house_bills)
-
-    response = make_response(template)
-    response.headers['Content-Type'] = 'applicaton/json'
+    response = make_response(json.dumps(house_bills))
+    response.headers['Content-Type'] = 'application/json'
     return response
 
-@app.route("/senate_bills")
-def bills():
+@app.route("/senate")
+def senate_bills():
     connection = get_db()
-    cursor = connection.execute('select count(*) as Bill_Count from senate_bills;')
+    cursor = connection.execute('select * from senate_numbers;')
 
     senate_bills = []
     for row in cursor.fetchall():
+        print dict(row)
         senate_bills.append(dict(row))
 
-    template = json.dumps(senate_bills)
-
-    response = make_response(template)
-    response.headers['Content-Type'] = 'applicaton/json'
+    response = make_response(json.dumps(senate_bills))
+    response.headers['Content-Type'] = 'application/json'
     return response
 
 ########## EXECUTION BOILERPLATE (ALSO DON'T CHANGE THIS) ##########
