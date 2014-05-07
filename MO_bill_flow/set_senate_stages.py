@@ -13,45 +13,53 @@ c = conn.cursor()
 
 # This is our mapping of actions descriptions to legislative stages. May change as we learn more about the legislative process.
 c.execute('''UPDATE senate_actions  
-SET stage = CASE  
-	WHEN Action_Desc LIKE '%Introduced%' THEN 'INTRODUCED HOUSE' 
-	WHEN Action_Desc LIKE '%Prefiled%' THEN 'INTRODUCED HOUSE' 
-	WHEN Action_Desc LIKE '%Offered%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%Read First Time%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%First Read%' THEN 'INTRODUCED HOUSE' 
-	WHEN Action_Desc LIKE '%Read Second Time%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%Second Read%' THEN 'INTRODUCED HOUSE' 
-	WHEN Action_Desc LIKE '%Public Hearing Completed (H)%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%Public Hearing Continued (H)%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%Public Hearing Scheduled, Bill not Heard (H)%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE 'Referred: %(H)' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE 'Rules %(H)' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE 'Rules - Returned%(H)' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE 'Action Postponed (H)' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE 'Placed on Informal Calendar%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%Read Third Time%' THEN 'INTRODUCED HOUSE'
+SET stage = CASE
+WHEN Action_Desc LIKE '%Introduced%' THEN 'INTRODUCED SENATE' 
+WHEN Action_Desc LIKE '%Prefiled%' THEN 'INTRODUCED SENATE' 
+WHEN Action_Desc LIKE '%Second Read and Referred S%Committee' THEN 'INTRODUCED SENATE'
+WHEN Action_Desc LIKE 'S First Read%' THEN 'INTRODUCED SENATE'
+WHEN Action_Desc LIKE '%Hearing Cancelled S%' THEN 'INTRODUCED SENATE'
+WHEN Action_Desc LIKE '%Hearing Conducted S%' THEN 'INTRODUCED SENATE'
+WHEN Action_Desc LIKE '%Hearing Scheduled But Not Heard S%' THEN 'INTRODUCED SENATE'
+WHEN Action_Desc LIKE 'Referred S%Committee' THEN 'INTRODUCED SENATE'
 
-	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE COMMITTEE'
+WHEN Action_Desc LIKE 'Voted Do Pass%S%Committee' THEN 'PASS SENATE COMMITTEE'
+WHEN Action_Desc LIKE '%Bill Placed on Informal Calendar%' THEN 'PASS SENATE COMMITTEE'
+WHEN Action_Desc LIKE '%Reported from S%Committee%' THEN 'PASS SENATE COMMITTEE'
+WHEN Action_Desc LIKE '%Perfected%' THEN 'PASS SENATE COMMITTEE'
+WHEN Action_Desc LIKE '%Reported Truly Perfected S%' THEN 'PASS SENATE COMMITTEE'
+WHEN Action_Desc LIKE 'SCS Voted Do Pass S%' THEN 'PASS SENATE COMMITTEE'
 
-	WHEN Action_Desc LIKE '%Do Pass%(H)' THEN 'PASS HOUSE COMMITTEE'
-	WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
-	WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
-	WHEN Action_Desc LIKE 'Perfected%' THEN 'PASS HOUSE COMMITTEE'
+WHEN Action_Desc LIKE 'S Third Read and Passed%' THEN 'PASS SENATE' 
+WHEN Action_Desc LIKE '%S adopted' THEN 'PASS SENATE'
 
-	WHEN Action_Desc IS 'Adopted (H)' THEN 'PASS HOUSE'
-	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'PASS HOUSE'
+WHEN Action_Desc LIKE 'H First Read%' THEN 'INTRODUCED HOUSE'
+WHEN Action_Desc LIKE 'H Second Read%' THEN 'INTRODUCED HOUSE'
+WHEN Action_Desc LIKE 'Hearing Conducted H%' THEN 'INTRODUCED HOUSE'
+WHEN Action_Desc LIKE 'Hearing Scheduled but not heard H%' THEN 'INTRODUCED HOUSE'
+WHEN Action_Desc LIKE 'Referred%H%Committee%' THEN 'INTRODUCED HOUSE'
+WHEN Action_Desc LIKE 'Reported to the House%' THEN 'INTRODUCED HOUSE'
 
-	WHEN Action_Desc IS 'Adopted (S)' THEN 'PASS SENATE'
-	WHEN Action_Desc IS 'Approved (H)' THEN 'PASS HOUSE'
-	WHEN Action_Desc IS 'Reported to The Senate (S)' THEN 'PASS HOUSE'
-	WHEN Action_Desc LIKE 'Reported to The House with%(H)%' THEN 'PASS SENATE'
-	WHEN Action_Desc IS 'Approved (S)' THEN 'PASS SENATE'
+WHEN Action_Desc LIKE '%Voted Do Pass%H%Committee' THEN 'PASS HOUSE COMMITTEE'
+WHEN Action_Desc LIKE 'Reported Do Pass%H%Committee%' THEN 'PASS HOUSE COMMITTEE'
 
-	WHEN Action_Desc IS 'Delivered to Secretary of State (G)' THEN 'PASS CONFERENCE COMMITTEE'
+WHEN Action_Desc LIKE 'H Third Read and Passed%' THEN 'PASS HOUSE'
+WHEN Action_Desc LIKE 'HCS Reported Do Pass H%' THEN 'PASS HOUSE'
+WHEN Action_Desc LIKE 'H adopted%' THEN 'PASS HOUSE'
 
-	WHEN Action_Desc LIKE '%WITHDRAWN (H)%' THEN 'WITHDRAWN'
-	ELSE NULL END;'''
-)
+
+WHEN Action_Desc LIKE '%DELIVERED TO GOVERNOR%' THEN 'PASS CONFERENCE COMMITTEE' 
+WHEN Action_Desc LIKE '%Truly Agreed To and Finally Passed' THEN 'PASS CONFERENCE COMMITTEE' 
+
+WHEN Action_Desc LIKE '%Signed by Governor%' THEN 'SIGNED BY GOVERNOR' 
+
+WHEN Action_Desc LIKE '%Bill Withdrawn%' THEN 'WITHDRAWN'  
+WHEN Action_Desc LIKE 'Bill Combined%' THEN 'BILL COMBINED'
+
+ELSE Null
+END
+
+''')
 
 c.execute('''DROP TABLE IF EXISTS senate_numbers''')
 
