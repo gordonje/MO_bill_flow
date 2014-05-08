@@ -50,19 +50,17 @@ c.execute('''UPDATE senate_actions
 
 
 	WHEN Action_Desc LIKE '%DELIVERED TO GOVERNOR%' THEN 'PASS CONFERENCE COMMITTEE' 
-	WHEN Action_Desc LIKE '%Truly Agreed To and Finally Passed' THEN 'PASS CONFERENCE COMMITTEE' 
+	WHEN Action_Desc LIKE '%Truly Agreed To and Finally Passed' THEN 'PASS CONFERENCE COMMITTEE'  
 
-	WHEN Action_Desc LIKE '%Signed by Governor%' THEN 'SIGNED BY GOVERNOR' 
-
-	WHEN Action_Desc LIKE '%Bill Withdrawn%' THEN 'WITHDRAWN'  
-	WHEN Action_Desc LIKE 'Bill Combined%' THEN 'BILL COMBINED'
+	-- WHEN Action_Desc LIKE '%Bill Withdrawn%' THEN 'WITHDRAWN'  
+	-- WHEN Action_Desc LIKE 'Bill Combined%' THEN 'BILL COMBINED'
 	ELSE Null
 	END;'''
 )
 
-stages = []
-for row in c.execute('''SELECT DISTINCT stage FROM senate_actions WHERE stage IS NOT NULL;''').fetchall():
-	stages.append(row[0])
+stages = ['INTRODUCED SENATE', 'PASS SENATE COMMITTEE', 'PASS SENATE', 'INTRODUCED HOUSE', 'PASS HOUSE COMMITTEE', 'PASS HOUSE', 'PASS CONFERENCE COMMITTEE']
+# for row in c.execute('''SELECT DISTINCT stage FROM senate_actions WHERE stage IS NOT NULL;''').fetchall():
+# 	stages.append(row[0])
 
 output = []
 

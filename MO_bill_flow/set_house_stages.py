@@ -33,30 +33,31 @@ SET stage = CASE
 	WHEN Action_Desc LIKE '%Read Third Time%' THEN 'INTRODUCED HOUSE'
 
 	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE COMMITTEE'
-
 	WHEN Action_Desc LIKE '%Do Pass%(H)' THEN 'PASS HOUSE COMMITTEE'
-	WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
-	WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
 	WHEN Action_Desc LIKE 'Perfected%' THEN 'PASS HOUSE COMMITTEE'
 
 	WHEN Action_Desc IS 'Adopted (H)' THEN 'PASS HOUSE'
 	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'PASS HOUSE'
-
-	WHEN Action_Desc IS 'Adopted (S)' THEN 'PASS SENATE'
 	WHEN Action_Desc IS 'Approved (H)' THEN 'PASS HOUSE'
-	WHEN Action_Desc IS 'Reported to The Senate (S)' THEN 'PASS HOUSE'
+
+	WHEN Action_Desc IS 'Reported to The Senate (S)' THEN 'INTRODUCED SENATE'
+
+	WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
+	WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
+	
+	WHEN Action_Desc IS 'Adopted (S)' THEN 'PASS SENATE'
 	WHEN Action_Desc LIKE 'Reported to The House with%(H)%' THEN 'PASS SENATE'
 	WHEN Action_Desc IS 'Approved (S)' THEN 'PASS SENATE'
 
 	WHEN Action_Desc IS 'Delivered to Secretary of State (G)' THEN 'PASS CONFERENCE COMMITTEE'
 
-	WHEN Action_Desc LIKE '%WITHDRAWN (H)%' THEN 'WITHDRAWN'
+	-- WHEN Action_Desc LIKE '%WITHDRAWN (H)%' THEN 'WITHDRAWN'
 	ELSE NULL END;'''
 )
 
-stages = []
-for row in c.execute('''SELECT DISTINCT stage FROM house_actions WHERE stage IS NOT NULL;''').fetchall():
-	stages.append(row[0])
+stages = ['INTRODUCED HOUSE', 'PASS HOUSE COMMITTEE', 'PASS HOUSE', 'INTRODUCED SENATE', 'PASS SENATE COMMITTEE', 'PASS SENATE', 'PASS CONFERENCE COMMITTEE']
+# for row in c.execute('''SELECT DISTINCT stage FROM house_actions WHERE stage IS NOT NULL;''').fetchall():
+# 	stages.append(row[0])
 
 output = []
 
