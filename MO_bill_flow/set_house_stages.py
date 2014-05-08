@@ -30,15 +30,18 @@ SET stage = CASE
 	WHEN Action_Desc LIKE 'Rules - Returned%(H)' THEN 'INTRODUCED HOUSE'
 	WHEN Action_Desc LIKE 'Action Postponed (H)' THEN 'INTRODUCED HOUSE'
 	WHEN Action_Desc LIKE 'Placed on Informal Calendar%' THEN 'INTRODUCED HOUSE'
-	WHEN Action_Desc LIKE '%Read Third Time%' THEN 'INTRODUCED HOUSE'
 
-	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE COMMITTEE'
-	WHEN Action_Desc LIKE '%Do Pass (H)%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'Reported Do Pass%(H)%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'Motion to Do Pass Failed%' THEN 'INTRODUCED HOUSE'
 	WHEN Action_Desc LIKE 'Perfected%' THEN 'PASS HOUSE COMMITTEE'
-	WHEN Action_Desc LIKE 'HCS Adopted(H)%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'HCS Adopted (H)%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'HCS Voted Do Pass%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'HCS Reported Do Pass%' THEN 'PASS HOUSE COMMITTEE' 
 
 	WHEN Action_Desc LIKE 'Adopted (H)%' THEN 'PASS HOUSE'
 	WHEN Action_Desc LIKE 'Approved (H)' THEN 'PASS HOUSE'
+	WHEN Action_Desc LIKE 'Third Read and Passed (H)%' THEN 'PASS HOUSE'
+	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE'
 
 	WHEN Action_Desc LIKE 'Reported to The Senate (S)' THEN 'INTRODUCED SENATE'
 	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'INTRODUCED SENATE'
