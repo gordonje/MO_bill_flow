@@ -1,5 +1,6 @@
 from datetime import datetime
 import sqlite3
+import json
 
 start_time = datetime.now()
 
@@ -53,62 +54,56 @@ SET stage = CASE
 	ELSE NULL END;'''
 )
 
-c.execute('''DROP TABLE IF EXISTS house_numbers''')
-
-conn.commit()
-
-c.execute('''CREATE TABLE house_numbers (
-	stage VARCHAR(15) NOT NULL,
-	all_bills INTEGER NULL,
-	dem_bills INTEGER NULL,
-	rep_bills INTEGER NULL
-	)'''
-)
-
-c.execute('''INSERT INTO house_numbers (stage) SELECT stage FROM house_actions WHERE stage IS NOT NULL GROUP BY stage''')
-conn.commit()
-
 stages = []
 for row in c.execute('''SELECT DISTINCT stage FROM house_actions WHERE stage IS NOT NULL;''').fetchall():
 	stages.append(row[0])
 
+output = []
+
 for stage in stages:
-	c.execute('''UPDATE house_numbers 
-		SET all_bills = (
-			SELECT count(*) 
-			FROM house_bills 
-			WHERE bill_type + bill_number IN (
-				select bill_type + bill_number
-				from house_actions 
-				where stage = ?
-				)
-		),
-		dem_bills = (
-			SELECT count(*) 
-			FROM house_bills
-			JOIN representatives
-			ON representatives.district = house_bills.sponsor_district 
-			WHERE bill_type + bill_number IN (
-				SELECT bill_type + bill_number 
-				FROM house_actions 
-				WHERE stage = ?
-				)
-			and representatives.party = 'Democrat'
-			),
-		rep_bills = (
-			SELECT count(*) 
-			FROM house_bills
-			JOIN representatives
-			ON representatives.district = house_bills.sponsor_district 
-			WHERE bill_type + bill_number in (
-				SELECT bill_type + bill_number 
-				FROM house_actions 
-				WHERE stage = ?
-				)
-			AND representatives.party = 'Republican'
-			)
-		WHERE stage = ?
-	''', (stage, stage, stage, stage))
-	conn.commit()
+
+	row_dict = {"stage": stage}
+
+	c.execute('''SELECT count(*) 
+					FROM house_bills 
+					WHERE bill_type + bill_number IN (
+						SELECT bill_type + bill_number
+						FROM house_actions 
+						WHERE stage = ?
+					);''', [stage])
+
+	row_dict["all_bills"] = c.fetchone()[0]
+
+	c.execute('''SELECT count(*) 
+					FROM house_bills
+					JOIN representatives
+					ON representatives.district = house_bills.sponsor_district 
+					WHERE bill_type + bill_number IN (
+						SELECT bill_type + bill_number 
+						FROM house_actions 
+						WHERE stage = ?
+					)
+					AND representatives.party = 'Democrat';''', [stage])
+
+	row_dict["dem_bills"] = c.fetchone()[0]
+
+	c.execute('''SELECT count(*) 
+					FROM house_bills
+					JOIN representatives
+					ON representatives.district = house_bills.sponsor_district 
+					WHERE bill_type + bill_number IN (
+						SELECT bill_type + bill_number 
+						FROM house_actions 
+						WHERE stage = ?
+					)
+					AND representatives.party = 'Republican';''', [stage])
+
+	row_dict["rep_bills"] = c.fetchone()[0]
+
+	output.append(row_dict)
 
 conn.close()
+
+jsonFile = open('house_numbers.json', 'w')
+jsonFile.write(json.dumps(output))
+jsonFile.close()
