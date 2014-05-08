@@ -33,23 +33,28 @@ SET stage = CASE
 	WHEN Action_Desc LIKE '%Read Third Time%' THEN 'INTRODUCED HOUSE'
 
 	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE COMMITTEE'
-	WHEN Action_Desc LIKE '%Do Pass%(H)' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE '%Do Pass (H)%' THEN 'PASS HOUSE COMMITTEE'
 	WHEN Action_Desc LIKE 'Perfected%' THEN 'PASS HOUSE COMMITTEE'
+	WHEN Action_Desc LIKE 'HCS Adopted(H)%' THEN 'PASS HOUSE COMMITTEE'
 
-	WHEN Action_Desc IS 'Adopted (H)' THEN 'PASS HOUSE'
-	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'PASS HOUSE'
-	WHEN Action_Desc IS 'Approved (H)' THEN 'PASS HOUSE'
+	WHEN Action_Desc LIKE 'Adopted (H)%' THEN 'PASS HOUSE'
+	WHEN Action_Desc LIKE 'Approved (H)' THEN 'PASS HOUSE'
 
-	WHEN Action_Desc IS 'Reported to The Senate (S)' THEN 'INTRODUCED SENATE'
+	WHEN Action_Desc LIKE 'Reported to The Senate (S)' THEN 'INTRODUCED SENATE'
+	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'INTRODUCED SENATE'
+	WHEN Action_Desc LIKE 'Hearing Cancelled%(S)%' THEN 'INTRODUCED SENATE'
+	WHEN Action_Desc LIKE 'Referred%(S)%' THEN 'INTRODUCED SENATE'
+	WHEN Action_Desc LIKE 'Removed form Consent Calendar(S)%' THEN 'INTRODUCED SENATE'
 
 	WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
 	WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
 	
-	WHEN Action_Desc IS 'Adopted (S)' THEN 'PASS SENATE'
+	WHEN Action_Desc LIKE 'Adopted (S)%' THEN 'PASS SENATE'
 	WHEN Action_Desc LIKE 'Reported to The House with%(H)%' THEN 'PASS SENATE'
-	WHEN Action_Desc IS 'Approved (S)' THEN 'PASS SENATE'
+	WHEN Action_Desc LIKE 'Approved (S)%' THEN 'PASS SENATE'
 
-	WHEN Action_Desc IS 'Delivered to Secretary of State (G)' THEN 'PASS CONFERENCE COMMITTEE'
+	WHEN Action_Desc LIKE 'Delivered to Secretary of State (G)%' THEN 'PASS CONFERENCE COMMITTEE'
+	WHEN Action_Desc LIKE 'Delivered to Governor (G)%' THEN 'PASS CONFERENCE COMMITTEE'
 
 	-- WHEN Action_Desc LIKE '%WITHDRAWN (H)%' THEN 'WITHDRAWN'
 	ELSE NULL END;'''
