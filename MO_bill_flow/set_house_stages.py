@@ -37,7 +37,6 @@ SET stage = CASE
 	WHEN Action_Desc LIKE 'HCS Adopted (H)%' THEN 'PASS HOUSE COMMITTEE'
 	WHEN Action_Desc LIKE 'HCS Voted Do Pass%' THEN 'PASS HOUSE COMMITTEE'
 	WHEN Action_Desc LIKE 'HCS Reported Do Pass%' THEN 'PASS HOUSE COMMITTEE' 
-<<<<<<< HEAD
 
 	WHEN Action_Desc LIKE 'Adopted (H)%' THEN 'PASS HOUSE'
 	WHEN Action_Desc LIKE 'Approved (H)' THEN 'PASS HOUSE'
@@ -50,20 +49,6 @@ SET stage = CASE
 	WHEN Action_Desc LIKE 'Referred%(S)%' THEN 'INTRODUCED SENATE'
 	WHEN Action_Desc LIKE 'Removed form Consent Calendar(S)%' THEN 'INTRODUCED SENATE'
 
-=======
-
-	WHEN Action_Desc LIKE 'Adopted (H)%' THEN 'PASS HOUSE'
-	WHEN Action_Desc LIKE 'Approved (H)' THEN 'PASS HOUSE'
-	WHEN Action_Desc LIKE 'Third Read and Passed (H)%' THEN 'PASS HOUSE'
-	WHEN Action_Desc LIKE 'Third Read and Passed%(H)%' THEN 'PASS HOUSE'
-
-	WHEN Action_Desc LIKE 'Reported to The Senate (S)' THEN 'INTRODUCED SENATE'
-	WHEN Action_Desc LIKE 'Public Hearing%(S)%' THEN 'INTRODUCED SENATE'
-	WHEN Action_Desc LIKE 'Hearing Cancelled%(S)%' THEN 'INTRODUCED SENATE'
-	WHEN Action_Desc LIKE 'Referred%(S)%' THEN 'INTRODUCED SENATE'
-	WHEN Action_Desc LIKE 'Removed form Consent Calendar(S)%' THEN 'INTRODUCED SENATE'
-
->>>>>>> 5dab3ac21b935646b0bb5e34de0c687e22f6b660
 	WHEN Action_Desc LIKE '%Do Pass%(S)' THEN 'PASS SENATE COMMITTEE'
 	WHEN Action_Desc LIKE '%(S)%Do Pass%' THEN 'PASS SENATE COMMITTEE'
 	
@@ -78,17 +63,11 @@ SET stage = CASE
 	ELSE NULL END;'''
 )
 
-<<<<<<< HEAD
 conn.commit()
 
 stages = []
-for row in c.execute('''SELECT DISTINCT stage FROM house_actions WHERE stage IS NOT NULL;''').fetchall():
+for row in c.execute('''SELECT stage FROM leg_stages WHERE chamber = 'H' ORDER BY sort_order;''').fetchall():
 	stages.append(row[0])
-=======
-stages = ['INTRODUCED HOUSE', 'PASS HOUSE COMMITTEE', 'PASS HOUSE', 'INTRODUCED SENATE', 'PASS SENATE COMMITTEE', 'PASS SENATE', 'PASS CONFERENCE COMMITTEE']
-# for row in c.execute('''SELECT DISTINCT stage FROM house_actions WHERE stage IS NOT NULL;''').fetchall():
-# 	stages.append(row[0])
->>>>>>> 5dab3ac21b935646b0bb5e34de0c687e22f6b660
 
 numbers_output = {
   "cols": [{"id": "stage", "label": "Stage", "type": "string"},
@@ -156,6 +135,7 @@ for i in c.execute('''SELECT all_bills.stage, avg(all_bills.duration)
 								bills.bill_type, 
 								bills.bill_number, 
 								bills.stage, 
+								leg_stages.sort_order,
 								earliest.action_date, 
 								latest.action_date, 
 								julianday(latest.action_date) - julianday(earliest.action_date) AS duration
@@ -165,18 +145,22 @@ for i in c.execute('''SELECT all_bills.stage, avg(all_bills.duration)
 								WHERE stage NOT NULL
 								GROUP BY bill_type, bill_number, stage
 							) AS bills
-							join (
+							JOIN (
 								SELECT bill_type, bill_number, stage, action_date, rowid
 								FROM house_actions
 							) AS earliest
 							ON bills.first_row = earliest.rowid
-							join (
+							JOIN (
 								SELECT bill_type, bill_number, stage, action_date, rowid
 								FROM house_actions
 							) AS latest
 							ON bills.last_row = latest.rowid
+							JOIN leg_stages
+							ON bills.stage = leg_stages.stage
+							AND leg_stages.chamber = 'H'
 						) AS all_bills
-						GROUP BY all_bills.stage;'''
+						GROUP BY all_bills.stage
+						ORDER BY all_bills.sort_order;'''
 			).fetchall():
 
 	cells = []
