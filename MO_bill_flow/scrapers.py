@@ -157,16 +157,29 @@ def get_house_bill_cosponsors (bill, requests_session):
 	
 	cosponsors = []
 
-	p1 = soup.find('p', attrs = {'style':'margin-bottom: 0.104167in; margin-bottom: 0.104167in'})
-	if p1 != None:
-		p2 = p1.findNextSibling('p', attrs = {'style':'margin-bottom: 0.104167in; margin-bottom: 0.104167in'})
-		p3 = p2.findNextSibling('p', attrs = {'style':'text-align: center; margin-bottom: 0.104167in'})
+	the_span = soup.find('span', attrs = {"style":"font-size: 10pt"})
 
-		span_text = p3.findChild('span').text.encode('utf-8', 'ignore').replace('\n', ' ').replace('\r', '')
+	if the_span == None:
+		# Usually the font-size is 10pt, sometimes 9pt. What fun!
+		the_span = soup.find('span', attrs = {"style":"font-size: 9pt"})
+		if the_span == None:
+		# And sometimes it's 12pt! YAY!
+			the_span = soup.find('span', attrs = {"style":"font-size: 12pt"})
+	
+	output = the_span.text.encode('utf-8', 'ignore').replace('\n', ' ').replace('\r', '')
 
-		return span_text
-	else:
-		return ''
+	return output
+
+	## Old code for parsing out co-sponsor names. Did not work consistently. Switched to just storing all the text.
+	# if p1 != None:
+	# 	p2 = p1.findNextSibling('p', attrs = {'style':'margin-bottom: 0.104167in; margin-bottom: 0.104167in'})
+	# 	p3 = p2.findNextSibling('p', attrs = {'style':'text-align: center; margin-bottom: 0.104167in'})
+
+	# 	span_text = p3.findChild('span').text.encode('utf-8', 'ignore').replace('\n', ' ').replace('\r', '')
+
+	# 	return span_text
+	# else:
+	# 	return ''
 
 	# for i in span_text.split(', ')[1:]:
 

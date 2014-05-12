@@ -16,11 +16,11 @@ target_db = 'DBs/bills_' + str(request_year) + '.sqlite'
 
 ########## Connecting to / setting up the database ##########
 
-# if there's already a database, archive it
+if there's already a database, archive it
 if path.exists(target_db):
 	print "Archiving old database..."
 	time_str = str(start_time.date()) + "-" + str(start_time.hour) + str(start_time.minute) + str(start_time.second)
-	shutil.copy2(target_db, 'DBs_Archive/bills_' + time_str + '.sqlite')
+	shutil.copy2(target_db, 'DBs/Archive/bills_' + time_str + '.sqlite')
 
 conn = sqlite3.connect(target_db)
 conn.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
@@ -79,13 +79,29 @@ for i in all_house_bills:
 		bill_info['calendar']
 	]
 		
-	if bill_info['has_cosponsors']:
+	if bill_info['has_cosponsors'] and bill_info['last_action_desc'].find('Withdrawn') > 0:
 		sleep(3)
 		bill_output.append(scrapers.get_house_bill_cosponsors(i, session))
 	else:
 		bill_output.append('')
 
-	c.execute('INSERT INTO house_bills VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', bill_output)
+	c.execute('''INSERT INTO house_bills (
+					bill_type,
+					bill_number,
+					url_id,
+					bill_string,
+					brief_desc,
+					sponsor_first_name,
+					sponsor_last_name,
+					sponsor_district,
+					lr_number,
+					effective_date,
+					last_action_date,
+					last_action_desc,
+					next_hearing,
+					calendar,
+					co_sponsor_text)
+				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', bill_output)
 	conn.commit()
 
 ########## Getting actions ##########
@@ -94,7 +110,13 @@ for i in all_house_bills:
 
 	actions_output = scrapers.get_house_actions(i, session)
 
-	c.executemany('INSERT INTO house_actions VALUES (?,?,?,?,?)', actions_output)
+	c.executemany('''INSERT INTO house_actions (
+						bill_type, 
+						bill_number, 
+						action_date, 
+						journal_page, 
+						action_desc)
+					VALUES (?,?,?,?,?)''', actions_output)
 	conn.commit()
 
 ########## Getting cosigners ##########
@@ -105,7 +127,12 @@ for i in all_house_bills:
 
 		cosigners_output = scrapers.get_house_bill_cosigners(i, session)
 
-		c.executemany('INSERT INTO house_bills_cosigners VALUES (?,?,?,?)', cosigners_output)
+		c.executemany('''INSERT INTO house_bills_cosigners (
+							bill_type,
+							bill_number,
+							cosigner_name,
+							signed_date_time)
+						VALUES (?,?,?,?)''', cosigners_output)
 		conn.commit()
 
 ########## Getting cosponsors ##########
@@ -132,7 +159,14 @@ print "Getting Reprsentatives..."
 
 reps_output = scrapers.get_representatives(session)
 
-c.executemany('INSERT INTO representatives VALUES (?,?,?,?,?,?)', reps_output)
+c.executemany('''INSERT INTO representatives (
+					last_name,
+					first_name,
+					district,
+					party,
+					phone,
+					room) 
+				VALUES (?,?,?,?,?,?)''', reps_output)
 conn.commit()
 
 ########## Finishing ##########
