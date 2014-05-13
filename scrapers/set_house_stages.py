@@ -6,7 +6,7 @@ start_time = datetime.now()
 
 request_year = start_time.year
 
-target_db = 'DBs/bills_' + str(request_year) + '.sqlite'
+target_db = '../DBs/bills_' + str(request_year) + '.sqlite'
 
 conn = sqlite3.connect(target_db)
 conn.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
@@ -172,10 +172,10 @@ for i in c.execute('''SELECT all_bills.stage, avg(all_bills.duration)
 
 conn.close()
 
-jsonFile = open('House_numbers_gchart.json', 'w')
+jsonFile = open('../app/static/House_numbers_gchart.json', 'w')
 jsonFile.write(json.dumps(numbers_output))
 jsonFile.close()
 
-jsonFile = open('House_avgs_gchart.json', 'w')
+jsonFile = open('../app/static/House_avgs_gchart.json', 'w')
 jsonFile.write(json.dumps(avgs_output))
 jsonFile.close()

@@ -12,7 +12,7 @@ print "Started at " + str(start_time) + "."
 
 request_year = start_time.year
 
-target_db = 'DBs/bills_' + str(request_year) + '.sqlite'
+target_db = '..\DBs/bills_' + str(request_year) + '.sqlite'
 
 ########## Connecting to / setting up the database ##########
 
