@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  	<title>Senate Bills</title>
+  	<title>{{ chamber }} Bills</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript">
@@ -12,7 +13,7 @@
       function drawBarChart() {
 
         var jsonData = $.ajax({
-          url: {{ url_for('static', filename='Senate_numbers.gchart.json') }},
+          url: "{{ url_for('static', filename= chamber + '_numbers_gchart.json') }}",
           dataType:"json",
           async: false
           }).responseText;
@@ -20,7 +21,7 @@
         var data = new google.visualization.DataTable(jsonData);
 
         var options = {
-          title: 'Senate Bills',
+          title: 'Number of Bills Passing Each Stage',
           vAxis: {title: 'Leg Stage',  titleTextStyle: {color: 'black'}},
           isStacked: true,
         };
@@ -32,7 +33,7 @@
       function drawLineChart() {
 
         var jsonData = $.ajax({
-          url: {{ url_for('static', filename='Senate_avgs.gchart.json') }},
+          url: "{{ url_for('static', filename= chamber + '_avgs_gchart.json') }}",
           dataType:"json",
           async: false
           }).responseText;
@@ -40,7 +41,7 @@
         var data = new google.visualization.DataTable(jsonData);
 
         var options = {
-          title: 'Average Duration per Stage',
+          title: 'Average BIll Duration Per Stage',
           vAxis: {title: 'Avg Num Days',  titleTextStyle: {color: 'black'}}
         };
 
@@ -56,7 +57,19 @@
     </script>
   </head>
   <body>
+
+    <div id="title">{{ chamber.upper() }} BILLS</div>
+    <div id="link">
+      
+      {% if chamber == 'House' %}
+        <a href="/Senate">Go to Senate</a>
+      {% else %}
+        <a href="/House">Go to House</a>
+      {% endif %}
+
+    </div>
     <div id="bar_chart" style="width: 1200px; height: 500px;"></div>
     <div id="line_chart" style="width: 1200px; height: 500px;"></div>
+
   </body>
 </html>
