@@ -54,6 +54,6 @@ docs/_build/
 
 # Added by JG
 *pyc
-MO_bill_flow/DBs/Archive/bills*
+/DBs/Archive/bills*
 .DS_Store
 /notes
