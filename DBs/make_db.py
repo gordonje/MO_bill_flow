@@ -129,5 +129,13 @@ c.execute('''CREATE TABLE senators (
 	district INTEGER NOT NULL
 	)''')
 
+###### Stages table ######
+
+c.execute('''CREATE TABLE leg_stages (
+	chamber VARCHAR(1) NOT NULL,
+	stage VARCHAR(30) NOT NULL,
+	sort_order INTEGER NOT NULL
+	)''')
+
 conn.commit()
 conn.close()

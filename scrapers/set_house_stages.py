@@ -12,6 +12,25 @@ conn = sqlite3.connect(target_db)
 conn.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
 c = conn.cursor()
 
+# Delete the current stages for the the given chamber, then re-insert them, in case they are changed.
+c.execute('''DELETE FROM leg_stages WHERE chamber = 'H';''') 
+conn.commit()
+
+stages = [
+	{"stage": "INTRODUCED HOUSE", "sort_order": 1},
+	{"stage": "PASS HOUSE COMMITTEE", "sort_order": 2},
+	{"stage": "PASS HOUSE", "sort_order": 3},
+	{"stage": "INTRODUCED SENATE", "sort_order": 4},
+	{"stage": "PASS SENATE COMMITTEE", "sort_order": 5},
+	{"stage": "PASS SENATE", "sort_order": 6},
+	{"stage": "PASS CONFERENCE COMMITTEE", "sort_order": 7}
+]
+
+for i in stages:
+	c.execute('''INSERT INTO leg_stages (chamber, stage, sort_order) VALUES (?,?,?);''', ['H', i["stage"], i["sort_order"]])
+
+conn.commit()
+
 # This is our mapping of actions descriptions to legislative stages. May change as we learn more about the legislative process.
 c.execute('''UPDATE house_actions  
 SET stage = CASE  
@@ -65,11 +84,9 @@ SET stage = CASE
 
 conn.commit()
 
-stages = []
-for row in c.execute('''SELECT stage FROM leg_stages WHERE chamber = 'H' ORDER BY sort_order;''').fetchall():
-	stages.append(row[0])
-
-numbers_output = {
+# Building the JSON for the counts of Democrat versus Republican sponsored bills that passed each legislative stage.
+# This is the format that Google Charts expects
+counts_output = {
   "cols": [{"id": "stage", "label": "Stage", "type": "string"},
          {"id": "d_bills", "label": "Dem Bills", "type": "number"},
          {"id": "r_bills", "label": "Rep Bills", "type": "number"}
@@ -77,21 +94,11 @@ numbers_output = {
   "rows":[]
   }
 
-for stage in stages:
+for i in stages:
 
 	cells = []
 	
-	cells.append({"v": stage})
-
-	# c.execute('''SELECT count(*) 
-	# 				FROM house_bills 
-	# 				WHERE bill_type + bill_number IN (
-	# 					SELECT bill_type + bill_number
-	# 					FROM house_actions 
-	# 					WHERE stage = ?
-	# 				);''', [stage])
-
-	# row_dict["all_bills"] = c.fetchone()[0]
+	cells.append({"v": i["stage"]})
 
 	c.execute('''SELECT count(*) 
 					FROM house_bills
@@ -102,7 +109,7 @@ for stage in stages:
 						FROM house_actions 
 						WHERE stage = ?
 					)
-					AND representatives.party = 'Democrat';''', [stage])
+					AND representatives.party = 'Democrat';''', [i["stage"]])
 
 	cells.append({"v": c.fetchone()[0]})
 
@@ -115,13 +122,14 @@ for stage in stages:
 						FROM house_actions 
 						WHERE stage = ?
 					)
-					AND representatives.party = 'Republican';''', [stage])
+					AND representatives.party = 'Republican';''', [i["stage"]])
 
 	cells.append({"v": c.fetchone()[0]})
 
-	numbers_output["rows"].append({"c": cells})
+	counts_output["rows"].append({"c": cells})
 
-
+# Building the JSON for the average amount of time bills spend in each legislative stage.
+# This is the format that Google Charts expects
 avgs_output = {
   "cols": [{"id": "stage", "label": "Stage", "type": "string"},
          {"id": "avg", "label": "Average Duration", "type": "number"}
@@ -172,8 +180,9 @@ for i in c.execute('''SELECT all_bills.stage, avg(all_bills.duration)
 
 conn.close()
 
+# Finally, write to those JSON files.
 jsonFile = open('../app/static/House_numbers_gchart.json', 'w')
-jsonFile.write(json.dumps(numbers_output))
+jsonFile.write(json.dumps(counts_output))
 jsonFile.close()
 
 jsonFile = open('../app/static/House_avgs_gchart.json', 'w')
