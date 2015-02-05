@@ -9,6 +9,7 @@ MO_bill_flow is a news app that aggregates data about House and Senate bills in 
 This is a project for my [Advanced Data Journalism](https://github.com/cjdd3b/advanced-data-journalism/ "Advanced Data Journalism") taught by [Chase Davis](http://chasedavis.com/ "Chase Davis") and [Mike Jenner](http://journalism.missouri.edu/staff/michael-m-jenner/ "Mike Jenner") at the University of Missouri School of Journalism.
 
 MO_bill_flow has three high-level components:
+
 1.	*Data Acquisition:* Python scripts that scrape legislation data from [house.mo.gov](http://www.house.mo.gov/ "house.mo.gov") and [senate.mo.gov](http://www.senate.mo.gov/ "senate.mo.gov") and save to a local SQLite database.
 2.	*Analysis:* Python scripts that run aggregate queries on the SQLite database and write these aggregates to several JSON files.
 3.	*Vizualization:* A Flask app and html/javascript template that presents the aggregates in a series of Google Charts.
@@ -31,6 +32,7 @@ Data Acquisition
 Scraping Missouri legislative chambers respective websites -- [house.mo.gov](http://www.house.mo.gov/ "house.mo.gov") and [senate.mo.gov](http://www.senate.mo.gov/ "senate.mo.gov") -- is necessary in order to acquire all of the data I believe are potentially useful for this project and to keep the database updated in a timely manner.
 
 [MO_bill_flow/scrapers/](https://github.com/gordonje/MO_bill_flow/tree/master/scrapers "MO_bill_flow/scrapers/") contains [get_house_data.py](https://github.com/gordonje/MO_bill_flow/blob/master/MO_bill_flow/get_house_data.py "get_house_data.py") and [get_senate_data.py](https://github.com/gordonje/MO_bill_flow/blob/master/MO_bill_flow/get_senate_data.py "get_senate_data.py"), each of which you can run to get the current year's data from each chamber. These two scripts are quite similar to each other, each executing the following general steps:
+
 1. 	First, check to see if there's already a version of the given year's database. If so, a copy is saved in the 'DBs/Archive/' directory so that you can easily revert to the previous version.
 2. 	Delete all records from tables related to the given chamber.
 3. 	Gather a list of all bills introduced in the given chamber for the given year.
@@ -56,6 +58,7 @@ Databases
 The ['MO_bill_flow/DBs/' directory](https://github.com/gordonje/MO_bill_flow/tree/master/MO_bill_flow/DBs ['MO_bill_flow/DBs/' directory]) contains a database for each year for which legislative data has been acquired[^4]. 
 
 The each database has 12 tables:
+
 *	*house_bills* and *senate_bills* each contain distinct records of House Bills and Senate Bills. The primary key for these records is the combination of bill_type and bill_number.
 *	*house_actions* and *senate_actions* contain records of each legislative action taken against a House Bill or a Senate Bill, respectively, including each action's date (action_date) and the description (action_desc). In most cases, the same bill will have multiple action records.
 *	*house_bills_topics* and *senate_bills_topics* represent the general topics of each bill[^5]. Note that there is a many-to-many relationship between bills and topics.
@@ -69,11 +72,13 @@ Analysis
 --------
 
 MO_bill_flow curently aims to answer three basic question about Missouri's legislative process:
+
 1. 	How many bills pass each general stage of legislation?
 2. 	What proportion of these bills are sponsored by either political party?
 3. 	What is the average amount of time that a bill will sit in each legislative stage before moving on to the next one?
 
 Obviously, an important prerequisite is a better understanding of what are the general stages of the legislative process. Based on these helpful explainers (for the [House](http://www.house.mo.gov/content.aspx?info=/info/howbill.htm "House") and [Senate](http://www.house.mo.gov/content.aspx?info=/info/howbill.htm "Senate")), I surmised that the process for each chamber is more or less the same, and summarized the legislative stages thusly:
+
 4. 	*Introduced* in the orginating chamber
 5. 	*Passed by committee* relevant in the orginating chamber
 6. 	*Passed* by the originating chamber
@@ -87,6 +92,7 @@ With that, the next requirement was to map each of the distinct action_desc valu
 Since you'll want to continually update the database, we'll also need to reapply the stages. So these UPDATE statements were the basis for a couple of other Python scripts: [set_house_stages.py](https://github.com/gordonje/MO_bill_flow/blob/master/MO_bill_flow/set_house_stages.py "set_house_stages.py") and [set_senate_stages.py](https://github.com/gordonje/MO_bill_flow/blob/master/MO_bill_flow/get_senate_data.py "set_senate_stages.py"), both of which are in [MO_bill_flow/scrapers/](https://github.com/gordonje/MO_bill_flow/tree/master/scrapers "MO_bill_flow/scrapers/").
 
 These queries execute the following steps in order:
+
 1. 	Delete the leg_stages records for the given chamber
 2. 	Insert the leg_stages records for the given chamber (in case you decided to modify these)
 3. 	Update all the records in the chamber's actions table, setting the value of stage according the mapping of action_desc values to general legislative stages. Note that not every action record will have a stage value, as these records represent actions that are merely perfunctory or too discrete to care about.
