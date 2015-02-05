@@ -7,7 +7,9 @@ start_time = datetime.now()
 
 request_year = start_time.year
 
-target_db = 'DBs/bills_' + str(request_year) + '.sqlite'
+target_db = 'bills_' + str(request_year) + '.sqlite'
+
+print target_db
 
 # if there's already a database, archive it
 if path.exists(target_db):

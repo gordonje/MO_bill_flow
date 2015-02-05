@@ -12,15 +12,15 @@ print "Started at " + str(start_time) + "."
 
 request_year = start_time.year
 
-target_db = '..\DBs/bills_' + str(request_year) + '.sqlite'
+target_db = '../DBs/bills_' + str(request_year) + '.sqlite'
 
 ########## Connecting to / setting up the database ##########
 
-if there's already a database, archive it
+# if there's already a database, archive it
 if path.exists(target_db):
 	print "Archiving old database..."
 	time_str = str(start_time.date()) + "-" + str(start_time.hour) + str(start_time.minute) + str(start_time.second)
-	shutil.copy2(target_db, 'DBs/Archive/bills_' + time_str + '.sqlite')
+	shutil.copy2(target_db, '../DBs/Archive/bills_' + time_str + '.sqlite')
 
 conn = sqlite3.connect(target_db)
 conn.text_factory = lambda x: unicode(x, 'utf-8', 'ignore')
